@@ -102,6 +102,7 @@
     <script>
         let tradeType = "buy";
         let ethPrice = 0;
+        let userETHBalance = 1.5; // Örnek ETH bakiyesi (gerçek zamanlı verilerle değiştirilebilir)
 
         async function fetchPrice() {
             try {
@@ -129,7 +130,7 @@
                 currencyLabel.textContent = "ETH";
                 tradeButton.textContent = "ETH Satın Al";
             } else {
-                input.placeholder = "ETH Miktarı";
+                input.placeholder = "ETH Miktarı (Max: " + userETHBalance.toFixed(3) + ")";
                 currencyLabel.textContent = "USDT";
                 tradeButton.textContent = "ETH Sat";
             }
@@ -145,9 +146,13 @@
                 amount = 0.001;
             }
 
-            const total = tradeType === "buy"
-                ? (amount / ethPrice).toFixed(6)
-                : (amount * ethPrice).toFixed(2);
+            let total = 0;
+            if (tradeType === "buy") {
+                total = (amount / ethPrice).toFixed(6);
+            } else {
+                if (amount > userETHBalance) amount = userETHBalance; // Max ETH satışı
+                total = (amount * ethPrice).toFixed(2);
+            }
 
             document.getElementById("total").textContent = total;
         }
