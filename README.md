@@ -26,7 +26,7 @@
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 10px;
-            transition: color 0.3s ease; /* Renk geçişi ekledik */
+            transition: color 0.3s ease; /* Fiyatın renk geçişi */
         }
         .buttons {
             display: flex;
