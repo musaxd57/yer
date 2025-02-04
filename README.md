@@ -93,9 +93,9 @@
 
         async function fetchPrice() {
             try {
-                const response = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT");
+                const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
                 const data = await response.json();
-                ethPrice = parseFloat(data.price).toFixed(2);
+                ethPrice = parseFloat(data.ethereum.usd).toFixed(2);
                 document.getElementById("price").textContent = ethPrice;
             } catch (error) {
                 console.error("Fiyat alınamadı", error);
