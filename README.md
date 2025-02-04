@@ -6,8 +6,8 @@
     <title>ETH Alım-Satım Paneli</title>
     <style>
         body {
-            background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
-            color: white;
+            background: linear-gradient(135deg, #f3f4f6, #d1d5db);
+            color: #333;
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
@@ -15,12 +15,12 @@
             height: 100vh;
         }
         .container {
-            background: #222;
+            background: #ffffff;
             padding: 20px;
             border-radius: 12px;
-            width: 320px;
+            width: 350px;
             text-align: center;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
         .price {
             font-size: 24px;
@@ -41,8 +41,8 @@
             font-size: 16px;
             transition: 0.3s;
         }
-        .buy { background: green; color: white; }
-        .sell { background: red; color: white; }
+        .buy { background: #10b981; color: white; }
+        .sell { background: #ef4444; color: white; }
         .input-group {
             margin-top: 10px;
         }
@@ -51,11 +51,11 @@
             padding: 8px;
             margin-top: 5px;
             border-radius: 5px;
-            border: none;
+            border: 1px solid #ccc;
             text-align: center;
             font-size: 16px;
-            background: #333;
-            color: white;
+            background: #f9fafb;
+            color: #333;
         }
         .total {
             margin-top: 10px;
@@ -70,12 +70,16 @@
             border-radius: 8px;
             font-size: 18px;
             cursor: pointer;
+            background: #2563eb;
+            color: white;
             transition: 0.3s;
+        }
+        .trade-button:hover {
+            background: #1d4ed8;
         }
     </style>
 </head>
 <body>
-
     <div class="container">
         <div class="price">ETH/USDT - <span id="price">Loading...</span></div>
 
@@ -101,7 +105,7 @@
                 const data = await response.json();
                 ethPrice = parseFloat(data.ethereum.usd).toFixed(2);
                 document.getElementById("price").textContent = ethPrice;
-                calculateTotal(); // Yeni fiyatla toplamı güncelle
+                calculateTotal();
             } catch (error) {
                 console.error("Fiyat alınamadı", error);
             }
@@ -125,7 +129,7 @@
                 currencyLabel.textContent = "USDT";
                 tradeButton.textContent = "ETH Sat";
             }
-            calculateTotal(); // Seçim değiştiğinde anında toplamı güncelle
+            calculateTotal();
         }
 
         function calculateTotal() {
@@ -133,17 +137,16 @@
             let amount = parseFloat(amountInput.value);
 
             if (isNaN(amount) || amount < 0.001) {
-                amountInput.value = "0.001"; // Minimum miktar 0.001
+                amountInput.value = "0.001";
                 amount = 0.001;
             }
 
             const total = tradeType === "buy"
-                ? (amount / ethPrice).toFixed(6) // USDT ile alırken ETH hesapla
-                : (amount * ethPrice).toFixed(2); // ETH ile satarken USDT hesapla
+                ? (amount / ethPrice).toFixed(6)
+                : (amount * ethPrice).toFixed(2);
 
             document.getElementById("total").textContent = total;
         }
     </script>
-
 </body>
 </html>
