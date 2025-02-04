@@ -1,82 +1,123 @@
-import { useState, useEffect } from "react";
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETH Alım-Satım Paneli</title>
+    <style>
+        body {
+            background-color: #111;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #222;
+            padding: 20px;
+            border-radius: 12px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+        .price {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        button {
+            flex: 1;
+            margin: 5px;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .buy { background: green; color: white; }
+        .sell { background: red; color: white; }
+        .input-group {
+            display: none;
+            margin-top: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: none;
+            text-align: center;
+        }
+        .total {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .trade-button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
 
-export default function App() {
-  const [tradeType, setTradeType] = useState("buy"); // 'buy' veya 'sell'
-  const [price, setPrice] = useState(2735); // ETH fiyatı
-  const [amount, setAmount] = useState("");
+    <div class="container">
+        <div class="price">ETH/USDT - <span id="price">Loading...</span></div>
 
-  useEffect(() => {
-    const fetchPrice = async () => {
-      try {
-        const response = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT");
-        const data = await response.json();
-        setPrice(parseFloat(data.price).toFixed(2));
-      } catch (error) {
-        console.error("ETH fiyatını alırken hata oluştu", error);
-      }
-    };
-
-    fetchPrice();
-    const interval = setInterval(fetchPrice, 500); // 0.5 saniyede bir güncelle
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const total = amount ? (parseFloat(amount) * price).toFixed(2) : "0.00";
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950">
-      <div className="max-w-md mx-auto bg-gray-900 p-6 rounded-2xl shadow-xl text-white">
-        {/* Fiyat Gösterimi */}
-        <div className="text-xl font-semibold text-center mb-4">ETH/USDT - ${price}</div>
-        
-        {/* Al / Sat Butonları */}
-        <div className="flex space-x-4 mb-4">
-          <button
-            onClick={() => setTradeType("buy")}
-            className={`flex-1 py-2 rounded-lg text-lg font-semibold transition ${
-              tradeType === "buy" ? "bg-green-500" : "bg-gray-700"
-            }`}
-          >
-            Al
-          </button>
-          <button
-            onClick={() => setTradeType("sell")}
-            className={`flex-1 py-2 rounded-lg text-lg font-semibold transition ${
-              tradeType === "sell" ? "bg-red-500" : "bg-gray-700"
-            }`}
-          >
-            Sat
-          </button>
+        <div class="buttons">
+            <button class="buy" onclick="toggleTrade('buy')">Al</button>
+            <button class="sell" onclick="toggleTrade('sell')">Sat</button>
         </div>
-        
-        {/* Form Alanları */}
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm">Miktar (ETH)</label>
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full p-2 mt-1 rounded bg-gray-800 text-white focus:ring focus:ring-blue-500"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm">Toplam ({tradeType === "buy" ? "USDT" : "ETH"})</label>
-            <div className="w-full p-2 mt-1 rounded bg-gray-700 text-white">{total}</div>
-          </div>
+
+        <div class="input-group" id="trade-form">
+            <input type="number" id="amount" placeholder="Miktar (ETH)" oninput="calculateTotal()">
+            <div class="total">Toplam: <span id="total">0.00</span> <span id="currency">USDT</span></div>
+            <button class="trade-button" id="trade-button">İşlem Yap</button>
         </div>
-        
-        {/* İşlem Butonu */}
-        <button
-          className={`w-full mt-4 py-2 rounded-lg text-lg font-semibold transition ${
-            tradeType === "buy" ? "bg-green-600 hover:bg-green-500" : "bg-red-600 hover:bg-red-500"
-          }`}
-        >
-          {tradeType === "buy" ? "ETH Satın Al" : "ETH Sat"}
-        </button>
-      </div>
     </div>
-  );
-}
+
+    <script>
+        let tradeType = "buy";
+        let ethPrice = 0;
+
+        async function fetchPrice() {
+            try {
+                const response = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT");
+                const data = await response.json();
+                ethPrice = parseFloat(data.price).toFixed(2);
+                document.getElementById("price").textContent = ethPrice;
+            } catch (error) {
+                console.error("Fiyat alınamadı", error);
+            }
+        }
+
+        setInterval(fetchPrice, 500);
+        fetchPrice();
+
+        function toggleTrade(type) {
+            tradeType = type;
+            document.getElementById("trade-form").style.display = "block";
+            document.getElementById("currency").textContent = tradeType === "buy" ? "USDT" : "ETH";
+            document.getElementById("trade-button").textContent = tradeType === "buy" ? "ETH Satın Al" : "ETH Sat";
+        }
+
+        function calculateTotal() {
+            const amount = document.getElementById("amount").value;
+            const total = amount ? (parseFloat(amount) * ethPrice).toFixed(2) : "0.00";
+            document.getElementById("total").textContent = total;
+        }
+    </script>
+
+</body>
+</html>
