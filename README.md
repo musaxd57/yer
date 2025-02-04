@@ -34,15 +34,17 @@
         button {
             flex: 1;
             margin: 5px;
-            padding: 10px;
+            padding: 15px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             transition: 0.3s;
         }
-        .buy { background: #10b981; color: white; }
-        .sell { background: #ef4444; color: white; }
+        .buy { background: #10b981; color: white; font-size: 18px; }
+        .sell { background: #ef4444; color: white; font-size: 18px; }
+        .buy:hover { background: #059669; }
+        .sell:hover { background: #9b1c1c; }
         .input-group {
             margin-top: 10px;
         }
@@ -59,7 +61,7 @@
             position: relative;
         }
         input::placeholder {
-            color: #6b7280; /* Silik gri renk */
+            color: #6b7280;
         }
         .total {
             margin-top: 10px;
@@ -68,7 +70,7 @@
         }
         .trade-button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin-top: 10px;
             border: none;
             border-radius: 8px;
@@ -94,6 +96,15 @@
         .max-button:hover {
             background-color: #d97706;
         }
+        .loading-spinner {
+            display: none;
+            margin-top: 10px;
+        }
+        .success-message {
+            color: green;
+            font-size: 20px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -109,7 +120,9 @@
             <input type="number" id="amount" min="0.001" step="0.001" placeholder="USDT Miktarı" oninput="calculateTotal()">
             <button class="max-button" id="max-button" onclick="setMaxAmount()">Max</button>
             <div class="total">Toplam: <span id="total">0.00</span> <span id="currency">ETH</span></div>
-            <button class="trade-button" id="trade-button">ETH Satın Al</button>
+            <button class="trade-button" id="trade-button" onclick="processTransaction()">ETH Satın Al</button>
+            <div class="loading-spinner" id="loading-spinner">Yükleniyor...</div>
+            <div class="success-message" id="success-message"></div>
         </div>
     </div>
 
@@ -121,7 +134,7 @@
         let lastFetchedTime = 0; // Fiyatın en son ne zaman alındığı bilgisi
         const cacheDuration = 5000; // Fiyatı 5 saniye saklayacağız
 
-        // Fiyatları sürekli güncelleyen fonksiyon
+        // Binance API'den fiyat çekme fonksiyonu
         async function fetchPrice() {
             const currentTime = new Date().getTime();
             
@@ -131,11 +144,11 @@
                 calculateTotal();
                 return;
             }
-            
+
             try {
-                const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
+                const response = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT");
                 const data = await response.json();
-                ethPrice = parseFloat(data.ethereum.usd).toFixed(2);
+                ethPrice = parseFloat(data.price).toFixed(2);
                 lastFetchedTime = currentTime; // Fiyat alınma zamanını güncelle
                 document.getElementById("eth-price").textContent = ethPrice; // Canlı fiyatı ekrana yazdır
                 calculateTotal();
@@ -145,7 +158,7 @@
             }
         }
 
-        setInterval(fetchPrice, 500); // 0.5 saniyede bir güncelle (daha hızlı)
+        setInterval(fetchPrice, 300); // 0.3 saniyede bir güncelle (daha hızlı)
         fetchPrice(); // Sayfa yüklenirken fiyatı hemen al
 
         // Alım ve satım tipini belirleme
@@ -198,6 +211,23 @@
             }
 
             document.getElementById("total").textContent = total;
+        }
+
+        // İşlemi başlatan fonksiyon
+        function processTransaction() {
+            const loadingSpinner = document.getElementById("loading-spinner");
+            const successMessage = document.getElementById("success-message");
+            
+            // Yükleniyor simgesini göster
+            loadingSpinner.style.display = "block";
+            successMessage.textContent = "";
+
+            setTimeout(() => {
+                // Simüle edilen işlem tamamlandığında
+                loadingSpinner.style.display = "none";
+                successMessage.textContent = tradeType === "buy" ? "ETH Satın Alındı!" : "ETH Satıldı!";
+                // Bakiye güncellemesi yapılabilir burada
+            }, 2000); // 2 saniye simülasyon süresi
         }
     </script>
 </body>
