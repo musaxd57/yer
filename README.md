@@ -43,7 +43,6 @@
         .buy { background: green; color: white; }
         .sell { background: red; color: white; }
         .input-group {
-            display: none;
             margin-top: 10px;
         }
         input {
@@ -53,6 +52,7 @@
             border-radius: 5px;
             border: none;
             text-align: center;
+            font-size: 16px;
         }
         .total {
             margin-top: 10px;
@@ -76,14 +76,14 @@
         <div class="price">ETH/USDT - <span id="price">Loading...</span></div>
 
         <div class="buttons">
-            <button class="buy" onclick="toggleTrade('buy')">Al</button>
-            <button class="sell" onclick="toggleTrade('sell')">Sat</button>
+            <button class="buy" onclick="setTradeType('buy')">Al</button>
+            <button class="sell" onclick="setTradeType('sell')">Sat</button>
         </div>
 
-        <div class="input-group" id="trade-form">
-            <input type="number" id="amount" placeholder="Miktar (ETH)" oninput="calculateTotal()">
+        <div class="input-group">
+            <input type="number" id="amount" min="0.001" step="0.001" placeholder="Miktar (ETH)" oninput="calculateTotal()">
             <div class="total">Toplam: <span id="total">0.00</span> <span id="currency">USDT</span></div>
-            <button class="trade-button" id="trade-button">İşlem Yap</button>
+            <button class="trade-button" id="trade-button">ETH Satın Al</button>
         </div>
     </div>
 
@@ -105,16 +105,26 @@
         setInterval(fetchPrice, 500);
         fetchPrice();
 
-        function toggleTrade(type) {
+        function setTradeType(type) {
             tradeType = type;
-            document.getElementById("trade-form").style.display = "block";
             document.getElementById("currency").textContent = tradeType === "buy" ? "USDT" : "ETH";
             document.getElementById("trade-button").textContent = tradeType === "buy" ? "ETH Satın Al" : "ETH Sat";
+            calculateTotal(); // Anında toplamı güncelle
         }
 
         function calculateTotal() {
-            const amount = document.getElementById("amount").value;
-            const total = amount ? (parseFloat(amount) * ethPrice).toFixed(2) : "0.00";
+            const amountInput = document.getElementById("amount");
+            let amount = parseFloat(amountInput.value);
+
+            if (isNaN(amount) || amount < 0.001) {
+                amountInput.value = "0.001"; // Minimum miktar 0.001
+                amount = 0.001;
+            }
+
+            const total = tradeType === "buy"
+                ? (amount * ethPrice).toFixed(2) // Alımda USDT hesapla
+                : amount.toFixed(4); // Satışta ETH hesapla
+
             document.getElementById("total").textContent = total;
         }
     </script>
