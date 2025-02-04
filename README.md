@@ -98,7 +98,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="price">ETH/USDT - <span id="eth-price">Loading...</span></div>
+        <div class="price">ETH/USDT - <span id="eth-price">Yükleniyor...</span></div>
 
         <div class="buttons">
             <button class="buy" onclick="setTradeType('buy')">Al</button>
@@ -141,10 +141,11 @@
                 calculateTotal();
             } catch (error) {
                 console.error("Fiyat alınamadı", error);
+                document.getElementById("eth-price").textContent = "Fiyat Alınamadı"; // Hata durumunda mesaj göster
             }
         }
 
-        setInterval(fetchPrice, 300); // 0.3 saniyede bir güncelle
+        setInterval(fetchPrice, 500); // 0.5 saniyede bir güncelle (daha hızlı)
         fetchPrice(); // Sayfa yüklenirken fiyatı hemen al
 
         // Alım ve satım tipini belirleme
