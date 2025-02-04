@@ -26,6 +26,7 @@
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 10px;
+            transition: color 0.3s ease; /* Renk geçişi ekledik */
         }
         .buttons {
             display: flex;
@@ -109,7 +110,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="price">ETH/USDT - <span id="eth-price">Yükleniyor...</span></div>
+        <div class="price" id="eth-price">ETH/USDT - Yükleniyor...</div>
 
         <div class="buttons">
             <button class="buy" onclick="setTradeType('buy')">Al</button>
@@ -129,6 +130,7 @@
     <script>
         let tradeType = "buy";
         let ethPrice = 0;
+        let previousEthPrice = 0; // Önceki fiyatı tutacak değişken
         let userETHBalance = 1.5; // Kullanıcı ETH bakiyesi (gerçek zamanlı verilerle değiştirilebilir)
         let userUSDTBalance = 5000; // Kullanıcı USDT bakiyesi (gerçek zamanlı verilerle değiştirilebilir)
 
@@ -138,7 +140,20 @@
                 const response = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT");
                 const data = await response.json();
                 ethPrice = parseFloat(data.price).toFixed(2);
-                document.getElementById("eth-price").textContent = ethPrice; // Canlı fiyatı ekrana yazdır
+
+                // Fiyat değişimini kontrol et ve renk değişikliğini uygula
+                const priceElement = document.getElementById("eth-price");
+                if (ethPrice > previousEthPrice) {
+                    priceElement.style.color = "#10b981"; // Yeşil renk artışta
+                } else if (ethPrice < previousEthPrice) {
+                    priceElement.style.color = "#ef4444"; // Kırmızı renk azalışta
+                } else {
+                    priceElement.style.color = "#333"; // Fiyat aynı kaldığında renk nötr
+                }
+
+                // Fiyatı ekranda güncelle
+                document.getElementById("eth-price").textContent = "ETH/USDT - " + ethPrice;
+                previousEthPrice = ethPrice; // Önceki fiyatı güncelle
                 calculateTotal();
             } catch (error) {
                 console.error("Fiyat alınamadı", error);
