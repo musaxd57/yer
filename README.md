@@ -106,7 +106,7 @@
         </div>
 
         <div class="input-group">
-            <input type="number" id="amount" min="0.001" step="0.001" placeholder="Miktar" oninput="calculateTotal()">
+            <input type="number" id="amount" min="0.001" step="0.001" placeholder="USDT Miktarı" oninput="calculateTotal()">
             <button class="max-button" id="max-button" onclick="setMaxAmount()">Max</button>
             <div class="total">Toplam: <span id="total">0.00</span> <span id="currency">ETH</span></div>
             <button class="trade-button" id="trade-button">ETH Satın Al</button>
@@ -155,7 +155,7 @@
             const tradeButton = document.getElementById("trade-button");
 
             if (tradeType === "buy") {
-                input.placeholder = "USDT Miktarı";
+                input.placeholder = "USDT Miktarı"; // Alış kısmında USDT miktarı yazacak
                 currencyLabel.textContent = "ETH";
                 tradeButton.textContent = "ETH Satın Al";
             } else {
