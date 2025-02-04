@@ -81,11 +81,24 @@
         .trade-button:hover {
             background: #1d4ed8;
         }
+        .max-button {
+            background-color: #fbbf24;
+            color: white;
+            border-radius: 5px;
+            border: none;
+            padding: 8px;
+            margin-top: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .max-button:hover {
+            background-color: #d97706;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="price">ETH/USDT - <span id="price">Loading...</span></div>
+        <div class="price">ETH/USDT - <span id="eth-price">Loading...</span></div>
 
         <div class="buttons">
             <button class="buy" onclick="setTradeType('buy')">Al</button>
@@ -94,6 +107,7 @@
 
         <div class="input-group">
             <input type="number" id="amount" min="0.001" step="0.001" placeholder="Miktar" oninput="calculateTotal()">
+            <button class="max-button" id="max-button" onclick="setMaxAmount()">Max</button>
             <div class="total">Toplam: <span id="total">0.00</span> <span id="currency">ETH</span></div>
             <button class="trade-button" id="trade-button">ETH Satın Al</button>
         </div>
@@ -102,14 +116,28 @@
     <script>
         let tradeType = "buy";
         let ethPrice = 0;
-        let userETHBalance = 1.5; // Örnek ETH bakiyesi (gerçek zamanlı verilerle değiştirilebilir)
+        let userETHBalance = 1.5; // Kullanıcı ETH bakiyesi (gerçek zamanlı verilerle değiştirilebilir)
+        let userUSDTBalance = 5000; // Kullanıcı USDT bakiyesi (gerçek zamanlı verilerle değiştirilebilir)
+        let lastFetchedTime = 0; // Fiyatın en son ne zaman alındığı bilgisi
+        const cacheDuration = 5000; // Fiyatı 5 saniye saklayacağız
 
+        // Fiyatları sürekli güncelleyen fonksiyon
         async function fetchPrice() {
+            const currentTime = new Date().getTime();
+            
+            // Eğer son fiyatı alalı 5 saniye geçmemişse, cache'deki fiyatı kullan
+            if (currentTime - lastFetchedTime < cacheDuration && ethPrice !== 0) {
+                document.getElementById("eth-price").textContent = ethPrice;
+                calculateTotal();
+                return;
+            }
+            
             try {
                 const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
                 const data = await response.json();
                 ethPrice = parseFloat(data.ethereum.usd).toFixed(2);
-                document.getElementById("price").textContent = ethPrice;
+                lastFetchedTime = currentTime; // Fiyat alınma zamanını güncelle
+                document.getElementById("eth-price").textContent = ethPrice; // Canlı fiyatı ekrana yazdır
                 calculateTotal();
             } catch (error) {
                 console.error("Fiyat alınamadı", error);
@@ -117,8 +145,9 @@
         }
 
         setInterval(fetchPrice, 300); // 0.3 saniyede bir güncelle
-        fetchPrice();
+        fetchPrice(); // Sayfa yüklenirken fiyatı hemen al
 
+        // Alım ve satım tipini belirleme
         function setTradeType(type) {
             tradeType = type;
             const input = document.getElementById("amount");
@@ -137,6 +166,19 @@
             calculateTotal();
         }
 
+        // Kullanıcı bakiyesi ile maksimum alım veya satımı belirleme
+        function setMaxAmount() {
+            const input = document.getElementById("amount");
+            if (tradeType === "buy") {
+                const maxAmountToBuy = (userUSDTBalance / ethPrice).toFixed(6);
+                input.value = maxAmountToBuy;
+            } else {
+                input.value = userETHBalance.toFixed(3);
+            }
+            calculateTotal();
+        }
+
+        // Toplam değeri hesaplayan fonksiyon
         function calculateTotal() {
             const amountInput = document.getElementById("amount");
             let amount = parseFloat(amountInput.value);
