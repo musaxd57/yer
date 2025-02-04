@@ -6,7 +6,7 @@
     <title>ETH Alım-Satım Paneli</title>
     <style>
         body {
-            background: linear-gradient(135deg, #f3f4f6, #d1d5db);
+            background: linear-gradient(135deg, #6ee7b7, #3b82f6);
             color: #333;
             font-family: Arial, sans-serif;
             display: flex;
@@ -56,6 +56,10 @@
             font-size: 16px;
             background: #f9fafb;
             color: #333;
+            position: relative;
+        }
+        input::placeholder {
+            color: #6b7280; /* Silik gri renk */
         }
         .total {
             margin-top: 10px;
@@ -137,7 +141,7 @@
             let amount = parseFloat(amountInput.value);
 
             if (isNaN(amount) || amount < 0.001) {
-                amountInput.value = "0.001";
+                amountInput.value = "";
                 amount = 0.001;
             }
 
