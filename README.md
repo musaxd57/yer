@@ -131,25 +131,13 @@
         let ethPrice = 0;
         let userETHBalance = 1.5; // Kullanıcı ETH bakiyesi (gerçek zamanlı verilerle değiştirilebilir)
         let userUSDTBalance = 5000; // Kullanıcı USDT bakiyesi (gerçek zamanlı verilerle değiştirilebilir)
-        let lastFetchedTime = 0; // Fiyatın en son ne zaman alındığı bilgisi
-        const cacheDuration = 5000; // Fiyatı 5 saniye saklayacağız
 
         // Binance API'den fiyat çekme fonksiyonu
         async function fetchPrice() {
-            const currentTime = new Date().getTime();
-            
-            // Eğer son fiyatı alalı 5 saniye geçmemişse, cache'deki fiyatı kullan
-            if (currentTime - lastFetchedTime < cacheDuration && ethPrice !== 0) {
-                document.getElementById("eth-price").textContent = ethPrice;
-                calculateTotal();
-                return;
-            }
-
             try {
                 const response = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT");
                 const data = await response.json();
                 ethPrice = parseFloat(data.price).toFixed(2);
-                lastFetchedTime = currentTime; // Fiyat alınma zamanını güncelle
                 document.getElementById("eth-price").textContent = ethPrice; // Canlı fiyatı ekrana yazdır
                 calculateTotal();
             } catch (error) {
