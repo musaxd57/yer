@@ -6,7 +6,7 @@
     <title>ETH Alım-Satım Paneli</title>
     <style>
         body {
-            background: linear-gradient(135deg, #6ee7b7, #3b82f6);
+            background: linear-gradient(135deg, #f3f4f6, #d1d5db);
             color: #333;
             font-family: Arial, sans-serif;
             display: flex;
